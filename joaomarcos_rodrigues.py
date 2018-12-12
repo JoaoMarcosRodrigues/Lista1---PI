@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+import math
 import copy
 import os
 
@@ -8,11 +9,11 @@ import os
 #
 # Nome: João Marcos de Oliveira Rodrigues
 # Matricula: 201600091952
-# E­mail: joaomarcosoliveirarodrigues@hotmail.com
+# E-mail: jmorodrigues@dcomp.ufs.br
 #
-# Nome:
-# Matricula:
-# E­mail:
+# Nome: Rivanildo Júnior dos Santos Andrade
+# Matricula: 201600092477
+# E-mail: rivanildo.andrade@dcomp.ufs.br
 #
 ########################################
 
@@ -37,7 +38,8 @@ def size(imagem):
 # Q.05
 def rgb2gray(imagem):
     ler = plt.imread(imagem)
-    cinza = np.dot(ler[..., :3], [0.299, 0.587, 0.114])
+    copia = ler.copy()
+    cinza = np.dot(copia[..., :3], [0.299, 0.587, 0.114])
     plt.imshow(cinza, cmap='gray')
     plt.show()
 
@@ -60,16 +62,17 @@ def imshow(arquivo):
 # Q.08
 def thresh(arquivo,limiar):
     imagem = plt.imread(arquivo);
+    copia = imagem.copy()
     altura = imagem.shape[0];
     largura = imagem.shape[1];
     for i in range(altura):
         for j in range(largura):
             for k in range(3):
                 if(imagem[i][j][k] >= limiar):
-                    imagem[i][j][k] = 255;
+                    copia[i][j][k] = 255;
                 else:
-                    imagem[i][j][k] = 0;
-    plt.imshow(imagem);
+                    copia[i][j][k] = 0;
+    plt.imshow(copia);
     plt.show();
 
 # Q.09
@@ -81,20 +84,69 @@ def negative(imagem):
     return copia
 
 # Q.10
-def contrast(arquivo,r,m):
-    imagem = plt.imread(arquivo)
-    constrate = sum(np.dot(r,(sum(imagem[i:j:,k],-m))),m)
-    plt.imshow(imagem)
-    plt.show()
+def contrast(imagem, r, m):
+    novaImagem = imagem.copy()
+    tamImagem = size(imagem)
+    if (nchannels(imagem) == 1):
+        for x in range(0, tamImagem[0]):
+            for y in range(0, tamImagem[1]):
+                result = truncate( r * (imagem[x][y] - m) + m)
+                novaImagem[x][y] = result
+    else:
+        for x in range(0, tamImagem[0]):
+            for y in range(0, tamImagem[1]):
+                for k in range(0, 3):
+                    result = truncate( r * (imagem[x][y][k] - m) + m)
+                    novaImagem[x][y][k] = result
+    return novaImagem
 
 # Q.11
+def hist(imagem, result):
+    tamImagem = size(imagem)
+    if (nchannels(imagem) == 1):
+        result = [0] * 256
+        for x in range(0, tamImagem[0]):
+            for y in range(0, tamImagem[1]):
+                result[imagem[x][y]] += 1
+        return result
+    else:
+        result[[0] * 256, [0] * 256, [0] * 256]
+        for x in range(0, tamImagem[0]):
+            for y in range(0, tamImagem[1]):
+                for k in range(0, 3):
+                    result[k][imagem[x][y][k]] += 1
+        return result
+
 # Q.12
-# Q.13
-# Q.14
-# Q.15
+def showhist(resultHist):
+    if(len(resultHist) == 1):
+        plt.hist(resultHist, 50, density=True, facecolor='g', alpha=0.75)
+    else:
+        plt.hist(resultHist[0], 50, density=True, facecolor='g', alpha=0.75)
+        plt.hist(resultHist[1], 50, density=True, facecolor='g', alpha=0.75)
+        plt.hist(resultHist[2], 50, density=True, facecolor='g', alpha=0.75)
+    plt.show()
+
+#Q.15
+def convolve(imagem,mask):
+    ler = plt.imread(imagem)
+    convolucao = np.convolve(ler,mask,mode='full')
+    plt.imshow(ler)
+    plt.show()
+
 # Q.16
+def maskBlur():
+    return (1/16) * np.asarray([[1,0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]])
+
 # Q.17
+def (imagem):
+    return convolve(imagem, maskBlur())
+
 # Q.18
+def seSquare3():
+    return np.asarray([[1, 1, 1],[1, 1, 1],[1, 1, 1]]).astype(np.uint8)
+
 # Q.19
-# Q.20
-# Q.21
+def seCross():
+    return np.asarray([[0, 1, 0], [1, 1, 1]]).astype(np.uint8)
+
