@@ -9,11 +9,11 @@ import os
 #
 # Nome: João Marcos de Oliveira Rodrigues
 # Matricula: 201600091952
-# E-mail: jmorodrigues@dcomp.ufs.br
+# E­mail: jmorodrigues@dcomp.ufs.br
 #
 # Nome: Rivanildo Júnior dos Santos Andrade
 # Matricula: 201600092477
-# E-mail: rivanildo.andrade@dcomp.ufs.br
+# E­mail: rivanildo.andrade@dcomp.ufs.br
 #
 ########################################
 
@@ -27,13 +27,13 @@ def imread(arquivo):
 # Q.03
 def nchannels(imagem):
     ler = plt.imread(imagem)
-    print("Canais: {}".format(ler.shape[2]))
+    return ler.shape[2]
 
 # Q.04
 def size(imagem):
     ler = plt.imread(imagem)
     vetor = [ler.shape[1],ler.shape[0]]
-    print('Largura x altura: ',vetor)
+    return vetor
 
 # Q.05
 def rgb2gray(imagem):
@@ -48,7 +48,7 @@ def imreadgray(arquivo):
     imagem = cv2.imread(arquivo,0)
     plt.imshow(imagem,cmap='gray')
     plt.title='Imagem em preto e branco'
-    plt.show()
+    return imagem
 
 # Q.07
 def imshow(arquivo):
@@ -72,8 +72,7 @@ def thresh(arquivo,limiar):
                     copia[i][j][k] = 255;
                 else:
                     copia[i][j][k] = 0;
-    plt.imshow(copia);
-    plt.show();
+    return copia
 
 # Q.09
 def negative(imagem):
@@ -90,13 +89,13 @@ def contrast(imagem, r, m):
     if (nchannels(imagem) == 1):
         for x in range(0, tamImagem[0]):
             for y in range(0, tamImagem[1]):
-                result = truncate( r * (imagem[x][y] - m) + m)
+                result = float(r * (imagem[x][y] - m) + m)
                 novaImagem[x][y] = result
     else:
         for x in range(0, tamImagem[0]):
             for y in range(0, tamImagem[1]):
                 for k in range(0, 3):
-                    result = truncate( r * (imagem[x][y][k] - m) + m)
+                    result = float(r * (imagem[x][y][k] - m) + m)
                     novaImagem[x][y][k] = result
     return novaImagem
 
@@ -128,18 +127,43 @@ def showhist(resultHist):
     plt.show()
 
 #Q.15
+def conv_transform(imagem):
+    copia = imagem.copy()
+
+    for i in range(imagem.shape[0]):
+        for j in range(imagem.shape[1]):
+            copia[i][j] = imagem[imagem.shape[0]-i-1][imagem.shape[1]-j-1]
+    return copia
+
 def convolve(imagem,mask):
-    ler = plt.imread(imagem)
-    convolucao = np.convolve(ler,mask,mode='full')
-    plt.imshow(ler)
-    plt.show()
+    mask = conv_transform(mask)
+    altura = imagem.shape[0]
+    largura = imagem.shape[1]
+
+    mask_altura = mask.shape[0]
+    mask_largura = mask.shape[1]
+
+    h = mask_altura//2
+    w = mask_largura//2
+
+    convolucao = np.zeros(imagem.shape)
+
+    for i in range(h,altura-h):
+        for j in range(w,largura-w):
+            sum = 0
+
+            for m in range(mask_altura):
+                for n in range(mask_largura):
+                    sum = sum + mask[m][n]*imagem[i-h+m][j-w+n]
+            convolucao[i][j] = sum
+    return convolucao
 
 # Q.16
 def maskBlur():
     return (1/16) * np.asarray([[1,0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]])
 
 # Q.17
-def (imagem):
+def blur(imagem):
     return convolve(imagem, maskBlur())
 
 # Q.18
